@@ -19,7 +19,38 @@ function sendMessageToCurrentTab(message) {
 }
 
 function callbackOpenNewTab(tab) {
-  chrome.tabs.executeScript(tab.id, {
-    file: 'scripts/rating.js'
-  });
+  var files = [
+    "lib/jquery-3.2.1.min.js",
+    "lib/jquery.xpath.min.js",
+  ];
+
+  concatenateInjections(tab.id, files, "scripts/rating.js");
 }
+
+
+
+function concatenateInjections(tabId, files, lastFile){
+
+  if( typeof lastFile !== 'undefined' ) 
+    files = files.concat([lastFile]);
+
+  var i = files.length;
+  var idx = 0 ;
+
+  (function (){
+    var that = arguments.callee;
+    idx++;
+    if(idx <= i){
+      var f = files[idx-1];
+      chrome.tabs.executeScript(
+        tabId, 
+        { 
+          file: f 
+        }, 
+        function() { 
+          that(idx);
+        });
+    }
+  })();
+}
+

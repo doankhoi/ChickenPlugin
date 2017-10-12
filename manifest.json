@@ -3,7 +3,11 @@
   "name": "Chicken Extension",
   "version": "0.1",
   "background": {
-    "scripts": ["background.js"],
+    "scripts": [
+      "lib/jquery-3.2.1.min.js",
+      "lib/jquery.xpath.min.js",
+      "background.js"
+    ],
     "persistent": false
   },
   "content_scripts": [
