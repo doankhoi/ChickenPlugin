@@ -1,3 +1,8 @@
+var LIB_FILES = [
+  "lib/jquery-3.2.1.min.js",
+  "lib/jquery.xpath.min.js"
+];
+
 chrome.browserAction.onClicked.addListener(function(tab) {
   sendMessageToCurrentTab({"message": "clicked_browser_action"});
 });
@@ -19,18 +24,12 @@ function sendMessageToCurrentTab(message) {
 }
 
 function callbackOpenNewTab(tab) {
-  var files = [
-    "lib/jquery-3.2.1.min.js",
-    "lib/jquery.xpath.min.js",
-  ];
-
-  concatenateInjections(tab.id, files, "scripts/rating.js");
+  concatenateInjections(tab.id, "scripts/rating.js");
 }
 
 
-
-function concatenateInjections(tabId, files, lastFile){
-
+function concatenateInjections(tabId, lastFile){
+  var files = LIB_FILES;
   if( typeof lastFile !== 'undefined' ) 
     files = files.concat([lastFile]);
 
