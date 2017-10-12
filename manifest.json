@@ -3,7 +3,8 @@
   "name": "Chicken Extension",
   "version": "0.1",
   "background": {
-    "scripts": ["background.js"]
+    "scripts": ["background.js"],
+    "persistent": false
   },
   "content_scripts": [
     {
@@ -14,6 +15,12 @@
     }
   ],
   "browser_action": {
-    "default_icon": "icon.png"
-  }
+    "default_icon": "images/icon.png"
+  },
+  "permissions": [
+    "tabs",
+    "notifications",
+    "http://*/",
+    "https://*/"
+  ]
 }
