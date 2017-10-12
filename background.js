@@ -1,15 +1,19 @@
+var LIB_FILES = [
+  "lib/jquery-3.2.1.min.js",
+  "lib/jquery.xpath.min.js",
+  "utils/mouse.js"
+];
+
+var MAPS_URLS_PARSE = {
+  'RATINGS': 'https://www.airbnb.com/stats/ratings',
+  'EARNINGS': 'https://www.airbnb.com/stats/earnings',
+  'VIEWS': 'https://www.airbnb.com/stats/views/',
+  'STANDARDS': 'https://www.airbnb.com/stats/standards'
+};
+
 chrome.browserAction.onClicked.addListener(function(tab) {
-  sendMessageToCurrentTab({"message": "clicked_browser_action"});
+  chrome.tabs.create({"url": MAPS_URLS_PARSE['RATINGS']}, callbackOpenNewTab);
 });
-
-
-
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if (request.message === "open_new_tab") {
-    chrome.tabs.create({"url": request.url}, callbackOpenNewTab);
-  }
-});
-
 
 function sendMessageToCurrentTab(message) {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
@@ -19,18 +23,12 @@ function sendMessageToCurrentTab(message) {
 }
 
 function callbackOpenNewTab(tab) {
-  var files = [
-    "lib/jquery-3.2.1.min.js",
-    "lib/jquery.xpath.min.js",
-  ];
-
-  concatenateInjections(tab.id, files, "scripts/rating.js");
+  concatenateInjections(tab.id, "scripts/rating.js");
 }
 
 
-
-function concatenateInjections(tabId, files, lastFile){
-
+function concatenateInjections(tabId, lastFile){
+  var files = LIB_FILES;
   if( typeof lastFile !== 'undefined' ) 
     files = files.concat([lastFile]);
 
