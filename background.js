@@ -1,7 +1,9 @@
 var LIB_FILES = [
   "lib/jquery-3.2.1.min.js",
   "lib/jquery.xpath.min.js",
-  "utils/mouse.js"
+  "lib/firebase.js",
+  "utils/mouse.js",
+  "utils/firebase_client.js"
 ];
 
 var MAPS_URLS_PARSE = {

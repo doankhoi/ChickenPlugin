@@ -2,7 +2,9 @@ var XPATH = {
   'total_stats': "//div[@class='_14bk9xpe']",
   'percent_stars': "//td[@class='_18j2f1c']/div[@class='_rotqmn2']",
   'next_page_review': "//button[@class='_1rp5252']",
-  'wraper_reviews': "//div[@class='_1f9rmq80']"
+  'wraper_reviews': "//div[@class='_1f9rmq80']",
+  'number_of_page': "//th/div[@class='_m2kx622']/span",
+  'listing_ids': "//select[@id='listingSelector']/option"
 };
 
 function parseReview(element) {
@@ -73,8 +75,8 @@ function parseRatingValue(ratingLabel) {
 
 function parseReviews() {
     var reviewElements = $(document).xpath(XPATH['wraper_reviews']);
-    reviewElements.each(function () {
-        console.log(parseReview($(this)));
+    reviewElements.each(function (index) {
+      console.log(parseReview($(this)));
     });
 }
 
@@ -112,10 +114,71 @@ function parsePercentStars() {
   return results;
 }
 
-parseReviews();
+function nextPageReview() {
+  var next_button = $(document).xpath(XPATH['next_page_review'])[1];
+  simulateMouse(next_button, "click");
+}
+
+function checkEndOfPage() {
+  var numberOfPageElement = $(document).xpath(XPATH['number_of_page']);
+  var textContent = $(numberOfPageElement).text();
+  console.log("Number of page : " + textContent);
+
+  if (textContent) {
+    var matchs = textContent.match(/(\d+) of (\d+)/);
+    if (matchs) {
+      return parseInt(matchs[1]) == parseInt(matchs[2]);
+    }
+  }
+
+  console.error("Xpath number of page wrong");
+  return true;
+}
+
+function getAllListingIds() {
+  var optionListings = $(document).xpath(XPATH['listing_ids']);
+  var listing_ids = [];
+
+  if (!optionListings) {
+    return [];
+  }
+  optionListings.each(function(index) {
+    try {
+      listing_id = parseInt($(this).val());
+      if (!isNaN(listing_id)) {
+        listing_ids.push(listing_id);
+      }
+    } catch (e) {}
+  });
+  return listing_ids;
+}
+
+function getAllData() {
+  var scriptData = $(document).xpath("//script[@data-hypernova-key='host_dashboard_statsbundlejs']");
+  var rawData = $(scriptData).text();
+  rawData = rawData.substring(4, rawData.length - 3);
+  try {
+    var data = JSON.parse(rawData);
+    delete data['phrases'];
+    return data;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+}
+
+storeRatingDataToFirebase(getAllData());
 
 // setTimeout(function() {
-//   var next_button = $(document).xpath(XPATH['next_page_review'])[1];
-//   simulateMouse(next_button, "click");
+//   while(true) {
+//     parseReviews();
+//     nextPageReview();
+//     sleep(5000);
+//     if (checkEndOfPage()) {
+//       parseReviews();
+//       break;
+//     }
+//   }
 // }, 3000);
+
 
