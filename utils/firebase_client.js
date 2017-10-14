@@ -11,13 +11,22 @@ firebase.initializeApp(CONFIG_FIREBASE);
 
 var DATABASE = firebase.database();
 
-function storeRatingDataToFirebase(ratingData) {
-	var hostId = ratingData.user.id;
-	if (!hostId) {
-		console.error("Not found host id");
-		return false;
-	}
+function storeRatingDataToFirebase(hostId, ratingData, isFirst=true) {
 	var key = '/ratings/' + hostId;
-	DATABASE.ref(key).set(ratingData);
+	if (isFirst) {
+		if (!hostId) {
+			console.error("Not found host id");
+			return false;
+		}
+		DATABASE.ref(key).set(ratingData);
+	} else {
+		var reviewsData = ratingData.reviews;
+		for (var reviewId in reviewsData) {
+			var path = key + '/hostingInsightsData/reviewsData/' + reviewsData[reviewId].id;
+			var update = {};
+			update[path] = reviewsData[reviewId];
+			DATABASE.ref().update(update);
+		}
+	}
 	return true;
 }

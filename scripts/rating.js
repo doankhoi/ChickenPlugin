@@ -153,32 +153,95 @@ function getAllListingIds() {
   return listing_ids;
 }
 
-function getAllData() {
+function getAllDataCurrentPage() {
   var scriptData = $(document).xpath("//script[@data-hypernova-key='host_dashboard_statsbundlejs']");
   var rawData = $(scriptData).text();
   rawData = rawData.substring(4, rawData.length - 3);
   try {
     var data = JSON.parse(rawData);
     delete data['phrases'];
-    return data;
+    return convertReviewData(data);
   } catch (e) {
     console.error(e);
     return null;
   }
 }
 
-storeRatingDataToFirebase(getAllData());
+function getConfigCurrentPage() {
+  var configMetaElement = $(document).xpath("//meta[@id='_bootstrap-layout-init']");
+  var rawConfig = $(configMetaElement).attr('content');
+  try {
+    rawConfig = rawConfig.replace('&quot;', '"');
+    return JSON.parse(rawConfig);
+  } catch (e) {
+    console.error("Get config page error");
+    return null;
+  }
+}
 
-// setTimeout(function() {
-//   while(true) {
-//     parseReviews();
-//     nextPageReview();
-//     sleep(5000);
-//     if (checkEndOfPage()) {
-//       parseReviews();
-//       break;
-//     }
-//   }
-// }, 3000);
+function convertReviewData(data) {
+  var reviewsData = data.hostingInsightsData.reviewsData;
+  if (reviewsData) {
+    var newReview = {};
+    for (var review in reviewsData) {
+      newReview[reviewsData[review].id] = reviewsData[review];
+    }
+    data.hostingInsightsData.reviewsData = newReview;
+  }
+
+  return data;
+}
+
+
+function getDataFromAPI(revieweeId, key, limit=4, offset=0) {
+  var baseAPI = "https://www.airbnb.com/api/v2/reviews?_format=for_web_host_stats&_order=recent&role=guest&currency=USD&locale=en";
+  baseAPI = baseAPI + '&reviewee_id=' + revieweeId + '&key=' + key + '&_limit=' + limit + '&_offset=' + offset;
+  fetch(baseAPI, {
+      method: 'GET',
+      credentials: 'include'
+    })
+    .then(function(response) {
+      return response.json();
+      // storeRatingDataToFirebase(revieweeId, data, false);
+    })
+    .then(function(json) {
+      storeRatingDataToFirebase(revieweeId, json, false);
+    })
+    .catch(function(err) {
+      console.log(err);
+    });
+}
+
+setTimeout(function() {
+  var isFirst = true;
+  var dataCurrentPage = getAllDataCurrentPage();
+  if (!dataCurrentPage) {
+    return;
+  }
+  var revieweeId = dataCurrentPage.user.id;
+
+  // Save data
+  storeRatingDataToFirebase(revieweeId, dataCurrentPage, true);
+  
+  var config = getConfigCurrentPage();
+  console.log('Config');
+  console.log(config);
+
+  if (!config) {
+    return;
+  }
+  var numHostRatings = parseInt(dataCurrentPage.user.num_host_ratings);
+  var key = config.api_config.key;
+  var numRepeat = Math.floor(numHostRatings / 20);
+  console.log("numRepeat");
+  console.log(numRepeat);
+
+  for (var i = 0; i <= numRepeat; i++) {
+    getDataFromAPI(revieweeId, key, 20, i*20);
+    sleep(5000);
+  }
+
+  alert('Updated data completed !');
+}, 3000);
 
 
