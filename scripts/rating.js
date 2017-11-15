@@ -224,8 +224,6 @@ setTimeout(function() {
   storeRatingDataToFirebase(revieweeId, dataCurrentPage, true);
   
   var config = getConfigCurrentPage();
-  console.log('Config');
-  console.log(config);
 
   if (!config) {
     return;
@@ -233,8 +231,6 @@ setTimeout(function() {
   var numHostRatings = parseInt(dataCurrentPage.user.num_host_ratings);
   var key = config.api_config.key;
   var numRepeat = Math.floor(numHostRatings / 20);
-  console.log("numRepeat");
-  console.log(numRepeat);
 
   for (var i = 0; i <= numRepeat; i++) {
     getDataFromAPI(revieweeId, key, 20, i*20);

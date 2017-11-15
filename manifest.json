@@ -5,7 +5,6 @@
   "background": {
     "scripts": [
       "lib/jquery-3.2.1.min.js",
-      "lib/jquery.xpath.min.js",
       "background.js"
     ],
     "persistent": false
@@ -16,16 +15,28 @@
         "<all_urls>"
       ],
       "js": [
+        "lib/d3.v3.min.js",
+        "lib/d3.layout.cloud.js",
+        "lib/sweetalert.js",
         "lib/jquery-3.2.1.min.js",
         "lib/jquery.xpath.min.js",
+        "lib/firebase.js",
+        "utils/firebase_client.js",
         "content.js"
+      ],
+      "css": [
+        "css/sweetalert.css",
+        "css/rating.css"
       ]
     }
   ],
   "browser_action": {
+    "default_popup": "popup.html",
     "default_icon": "images/icon.png"
   },
   "permissions": [
+    "activeTab",
+    "storage",
     "tabs",
     "notifications",
     "http://*/",
