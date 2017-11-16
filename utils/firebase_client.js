@@ -42,8 +42,5 @@ function getDataFromFirebase(pathData, callback) {
     var resultsRef = DATABASE.ref(pathData);
     resultsRef.on('value', function(snapshot) {
         callback(snapshot);
-      // snapshot.forEach(function(childSnapshot) {
-      //    console.log(childSnapshot.val());
-      // });
     });
 }
