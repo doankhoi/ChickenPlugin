@@ -178,6 +178,11 @@ function normalizeWord(word) {
 }
 
 function createTagCloud(words) {
+  if (words.length == 0) {
+    showMessage("Not found data reviews", "error");
+    return;
+  }
+  
   var wordmap = {};
   words.map(function(d) {
     var word_list = d.split(' ');
@@ -371,13 +376,12 @@ function getReviewsDataCallback(snapshot) {
 // Register listener message
 chrome.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
-    if (request.message === "push_data") {
-      // validate link
-      if (!isRatingPage()) {
+    if (!isRatingPage()) {
         showMessage("Please open link: " + LINK_GET + " to push data", 'error');
         return;
-      }
+    }
 
+    if (request.message === "push_data") {
       showOverlayLoading();
       var results = getAllReviewsCurrentUser();
 
@@ -396,7 +400,14 @@ chrome.runtime.onMessage.addListener(
       }
       
     } else if (request.message === "export-data") {
-      getDataFromFirebase('/ratings/132924724/hostingInsightsData/reviewsData', getReviewsDataCallback);
+      var dataCurrentPage = getAllDataCurrentPage();
+      if (!dataCurrentPage) {
+        showMessage('Not get all current page');
+        return;
+      }
+      var revieweeId = dataCurrentPage.user.id;
+      var path = '/ratings/' + revieweeId  + '/hostingInsightsData/reviewsData';
+      getDataFromFirebase(path, getReviewsDataCallback);
     }
   }
 );
