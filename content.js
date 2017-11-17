@@ -182,7 +182,7 @@ function createTagCloud(words) {
     showMessage("Not found data reviews", "error");
     return;
   }
-  
+
   var wordmap = {};
   words.map(function(d) {
     var word_list = d.split(' ');
@@ -300,8 +300,9 @@ function JSONToCVSConvertor(JSONData, ReportTitle, ShowLabel) {
     }   
     
     //Generate a file name
-    var fileName = "MyReport_";
-    fileName += ReportTitle.replace(/ /g,"_");   
+    var fileName = "Report_";
+    fileName += ReportTitle.replace(/ /g,"_");
+    fileName += '_' + (new Date().toJSON());   
     
     var uri = 'data:text/csv;charset=utf-8,' + escape(CSV);
     var link = document.createElement("a");    
@@ -363,11 +364,36 @@ function jsonFlatten(target, opts) {
   return output;
 }
 
+function filterField(reviewData) {
+  if (!reviewData) {
+    return;
+  }
+
+  var fields = [
+    'id', 'rating', 'accuracy', 'checkin', 'cleanliness', 
+    'value', 'location', 'communication', 'comments', 'private_feedback',
+    'reservation.check_in', 'reservation.check_out', 'reservation.confirmation_code',
+    'reservation.listing.id', 'reservation.listing.name', 'reservation.rounded_per_night_price_string_host',
+    'responded_at', 'response', 'reviewer.first_name', 'reviewer.host_name', 'reviewer.id',
+    'reviewer.is_superhost', 'reviewer.last_name', 'reviewer.picture_url', 'reviewer.profile_path',
+    'reviewer.profile_pic_path'
+  ];
+
+  var result = {};
+  fields.forEach(function(key) {
+    if (reviewData.hasOwnProperty(key)) {
+      result[key] = reviewData[key];
+    }
+  });
+
+  return result;
+}
 
 function getReviewsDataCallback(snapshot) {
   var reviewsData = [];
   snapshot.forEach(function(childSnapshot) {
-    reviewsData.push(jsonFlatten(childSnapshot.val()));
+    var filterData = filterField(jsonFlatten(childSnapshot.val()));
+    reviewsData.push(filterData);
   });
 
   JSONToCVSConvertor(reviewsData, "Ratings Report", true);
