@@ -1,4 +1,4 @@
-var LINK_GET = "https://www.airbnb.com/stats/ratings";
+var LINK_GET = "https://www.airbnb.com/stats/ratings/(\d+)";
 var STOP_WORD = [
   "a", "about", "above", "after", "again", "against", "all", 
   "am", "an", "and", "any", "are", "aren't", "as", "at", "be", 
@@ -166,7 +166,9 @@ function showMessage(message, type, callback) {
 }
 
 function isRatingPage() {
-  return window.location.href == LINK_GET ? true : false;
+  var patt = /.*stats\/ratings\/(\d+)/g;
+  var link = window.location.href;
+  return patt.test(link);
 }
 
 
