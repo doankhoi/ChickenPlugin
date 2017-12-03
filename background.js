@@ -13,6 +13,9 @@ function callBackPushData(response) {
 // Listener message from popup.js or content.js
 chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
   console.log("Enter background: " + request.message);
-  sendMessageToCurrentTab({message: request.message}, callBackPushData);
+  setTimeout(function() {
+    sendMessageToCurrentTab({message: request.message}, callBackPushData);
+    console.log("Send message: " + request.message);
+  }, 10000);
 });
 
