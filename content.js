@@ -166,7 +166,7 @@ function showMessage(message, type, callback) {
 }
 
 function isRatingPage() {
-  var patt = /.*stats\/ratings\/(\d+)/g;
+  var patt = /.*stats\/ratings\/?(\d+)?/g;
   var link = window.location.href;
   return patt.test(link);
 }
@@ -404,6 +404,8 @@ function getReviewsDataCallback(snapshot) {
 // Register listener message
 chrome.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
+    console.log("Message: " + request.message);
+
     if (!isRatingPage()) {
         showMessage("Please open link: " + LINK_GET + " to push data", 'error');
         return;
