@@ -385,6 +385,8 @@ function filterField(reviewData) {
   fields.forEach(function(key) {
     if (reviewData.hasOwnProperty(key)) {
       result[key] = reviewData[key];
+    } else {
+      result[key] = "";
     }
   });
 
