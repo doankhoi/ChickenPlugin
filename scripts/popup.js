@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     var pushData = document.getElementById('push-data');
     var exportData = document.getElementById('export-data');
-    var LINK_REVIEWS = "https://www.airbnb.com/stats/ratings";
+    var LINK_REVIEWS = "https://www.airbnb.com/progress/ratings";
 
     pushData.addEventListener('click', function() { 
         chrome.tabs.create({'url': LINK_REVIEWS}, function(tab) {

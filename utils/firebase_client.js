@@ -15,6 +15,9 @@ var LIST_COMMENTS = [];
 function storeRatingDataToFirebase(hostId, ratingData, isFirst=true) {
     var key = '/ratings/' + hostId;
     if (isFirst) {
+        if (ratingData.hasOwnProperty('imagePaths')) {
+            delete ratingData['imagePaths'];
+        }
         if (!hostId) {
             console.error("Not found host id");
             return false;
